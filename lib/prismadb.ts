@@ -1,10 +1,18 @@
-import { PrismaClient } from "@prisma/client"
+import { PrismaClient } from "@prisma/client";
 
 declare global {
-  var prisma: PrismaClient | undefined
+  var prisma: PrismaClient | undefined;
 }
 
-const prismadb = globalThis.prisma || new PrismaClient()
-if (process.env.NODE_ENV !== "production") globalThis.prisma = prismadb
+// Menggunakan instansi global PrismaClient jika sudah ada, atau membuat yang baru
+const prismadb = global.prisma || new PrismaClient({
+  log: ['query', 'info', 'warn', 'error'], // Menambahkan logging untuk query dan error
+});
 
+// Menyimpan instansi PrismaClient di global jika bukan di lingkungan produksi
+if (process.env.NODE_ENV !== "production") {
+  global.prisma = prismadb;
+}
+
+// Ekspor instansi prisma untuk digunakan di seluruh aplikasi
 export default prismadb;
